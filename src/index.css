@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-elegant-black text-slate-100 min-h-screen overflow-x-hidden;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-deep-blue-darker;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-pitch-green-dark rounded-full hover:bg-pitch-green;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-elegant-black-card backdrop-blur-md border border-slate-800/80 shadow-glass rounded-2xl;
+  }
+  
+  .glass-panel-premium {
+    @apply bg-gradient-to-b from-deep-blue-dark/90 to-elegant-black/95 backdrop-blur-xl border border-slate-700/50 shadow-glass rounded-3xl;
+  }
+
+  .text-glow-gold {
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+  }
+
+  .text-glow-green {
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+  }
+
+  .bg-stadium-lights {
+    background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+  }
+}
+
+/* Animaciones sutiles personalizadas */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}

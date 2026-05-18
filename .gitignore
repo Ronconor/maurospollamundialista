@@ -1,0 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Scratch and analysis files
+*.txt
+!overview.txt
+analysis.txt
+res_detailed.txt
+match_scores_search.txt
+grupos_detailed.txt
+mauro_preds.txt
+participants_preds_check.txt
+mauro_cols_check.txt
+any_pred_check.txt
+all_participants_preds.txt
+pagos_detailed.txt
+knockouts_detailed.txt
+knockouts_teams_check.txt
+knockouts_stages_check.txt
+knockouts_row2_check.txt
+octavos_cols_check.txt
+knockouts_match_numbers_check.txt
+all_knockouts_matches.txt
+reglas_detailed.txt
+team_names_tracking.txt
