@@ -10,6 +10,8 @@ interface HeaderProps {
   isDemo: boolean;
   sourceFileName?: string;
   participants: Participant[];
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -18,7 +20,9 @@ export const Header: React.FC<HeaderProps> = ({
   lastUpdated, 
   isDemo, 
   sourceFileName,
-  participants 
+  participants,
+  onRefresh,
+  isRefreshing
 }) => {
 
   const handleExportCSV = () => {
@@ -96,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="h-8 w-[1px] bg-slate-700 hidden sm:block" />
 
           <div className="hidden sm:flex items-center space-x-2 text-slate-300">
-            <RefreshCw className="w-4 h-4 text-gold animate-spin" style={{ animationDuration: '8s' }} />
+            <RefreshCw className={`w-4 h-4 text-gold ${isRefreshing ? 'animate-spin' : ''}`} style={isRefreshing ? {} : { animationDuration: '8s' }} />
             <div className="text-left text-xs">
               <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Última actualización</p>
               <p className="font-semibold text-slate-200">{lastUpdated}</p>
@@ -105,21 +109,35 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Sección Derecha: Botones de Acción */}
-        <div className="flex items-center space-x-3 w-full lg:w-auto justify-center lg:justify-end">
-          <button
-            onClick={onReset}
-            className="flex-1 sm:flex-none px-4 py-2.5 bg-slate-800/80 hover:bg-slate-700 border border-slate-600/80 text-white font-medium text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-all duration-200 group"
-          >
-            <Upload className="w-4 h-4 text-pitch-green-light group-hover:-translate-y-0.5 transition-transform" />
-            <span>Cargar Nuevo Excel</span>
-          </button>
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-center lg:justify-end">
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className={`flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-pitch-green-dark to-pitch-green hover:from-pitch-green hover:to-pitch-green-light text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-pitch-green/20 flex items-center justify-center space-x-2 transition-all duration-200 cursor-pointer ${
+                isRefreshing ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
+            >
+              <RefreshCw className={`w-4 h-4 text-slate-950 ${isRefreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+              <span>{isRefreshing ? 'Actualizando...' : 'Actualizar Datos'}</span>
+            </button>
+          )}
 
           <button
             onClick={handleExportCSV}
-            className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-pitch-green-dark to-pitch-green hover:from-pitch-green hover:to-pitch-green-light text-white font-semibold text-xs rounded-xl shadow-lg shadow-pitch-green/20 flex items-center justify-center space-x-2 transition-all duration-200 group"
+            className="flex-1 sm:flex-none px-4 py-2.5 bg-slate-800/80 hover:bg-slate-700 border border-slate-650 text-white font-semibold text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-all duration-200 group cursor-pointer"
           >
             <Download className="w-4 h-4 text-white group-hover:translate-y-0.5 transition-transform" />
             <span>Exportar Resumen</span>
+          </button>
+
+          <button
+            onClick={onReset}
+            className="flex-1 sm:flex-none px-4 py-2.5 bg-slate-900/50 hover:bg-slate-850/80 border border-slate-750 text-slate-400 hover:text-slate-200 font-medium text-xs rounded-xl shadow flex items-center justify-center space-x-2 transition-all duration-200 group cursor-pointer"
+            title="Cargar un archivo Excel local (manualmente)"
+          >
+            <Upload className="w-3.5 h-3.5 text-slate-500 group-hover:-translate-y-0.5 transition-transform" />
+            <span>Cargar Local</span>
           </button>
         </div>
 

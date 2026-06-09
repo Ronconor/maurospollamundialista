@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Trophy, Target, Dribbble, CreditCard, LineChart, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Trophy, Award, Target, Dribbble, CreditCard, LineChart, FileText, Sparkles } from 'lucide-react';
 import { Header } from './Header';
 import { SummaryCards } from './SummaryCards';
 import { Podium } from './Podium';
@@ -10,25 +10,31 @@ import { PaymentsPanel } from './PaymentsPanel';
 import { ResultsPanel } from './ResultsPanel';
 import { PredictionsPanel } from './PredictionsPanel';
 import { InsightsPanel } from './InsightsPanel';
+import { AciertosRondaPanel } from './AciertosRondaPanel';
+import { ReglasPanel } from './ReglasPanel';
 import { PollaData } from '../types';
 
 interface DashboardProps {
   data: PollaData;
   onReset: () => void;
   logoUrl: string;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ data, onReset, logoUrl }) => {
-  const [activeTab, setActiveTab] = useState<'resumen' | 'ranking' | 'pronosticos' | 'partidos' | 'finanzas' | 'analisis'>('resumen');
+export const Dashboard: React.FC<DashboardProps> = ({ data, onReset, logoUrl, onRefresh, isRefreshing }) => {
+  const [activeTab, setActiveTab] = useState<'resumen' | 'ranking' | 'aciertos' | 'pronosticos' | 'partidos' | 'finanzas' | 'analisis' | 'reglas'>('resumen');
   const [selectedParticipantId, setSelectedParticipantId] = useState<string | undefined>(undefined);
 
   const tabs = [
     { id: 'resumen', label: 'Resumen General', icon: LayoutDashboard },
     { id: 'ranking', label: 'Ranking & Podio', icon: Trophy },
+    { id: 'aciertos', label: 'Aciertos por Ronda', icon: Award },
     { id: 'pronosticos', label: 'Pronósticos', icon: Target },
     { id: 'partidos', label: 'Partidos 2026', icon: Dribbble },
     { id: 'finanzas', label: 'Finanzas & Pagos', icon: CreditCard },
     { id: 'analisis', label: 'Análisis & Gráficos', icon: LineChart },
+    { id: 'reglas', label: 'Reglas & Info', icon: FileText },
   ];
 
   const handleSelectParticipant = (id: string) => {
@@ -53,6 +59,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, onReset, logoUrl }) 
         isDemo={data.isDemo}
         sourceFileName={data.sourceFileName}
         participants={data.participants}
+        onRefresh={onRefresh}
+        isRefreshing={isRefreshing}
       />
 
       {/* Tarjetas de Resumen (Siempre visibles o en resumen principal) */}
@@ -155,6 +163,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, onReset, logoUrl }) 
             <motion.div key="analisis" variants={tabContentVariants} initial="hidden" animate="show" exit="exit" className="space-y-8">
               <InsightsPanel insights={data.insights} />
               <ChartsSection participants={data.participants} summary={data.summary} />
+            </motion.div>
+          )}
+
+          {activeTab === 'aciertos' && (
+            <motion.div key="aciertos" variants={tabContentVariants} initial="hidden" animate="show" exit="exit">
+              <AciertosRondaPanel equiposRondaData={data.equiposRonda} />
+            </motion.div>
+          )}
+
+          {activeTab === 'reglas' && (
+            <motion.div key="reglas" variants={tabContentVariants} initial="hidden" animate="show" exit="exit">
+              <ReglasPanel />
             </motion.div>
           )}
 

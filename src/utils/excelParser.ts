@@ -1,5 +1,5 @@
 import { read, utils } from 'xlsx';
-import { Participant, Prediction, MatchResult, Payment, PaymentStatus, PredictionStatus, MatchStatus } from '../types';
+import { Participant, Prediction, MatchResult, Payment, PaymentStatus, PredictionStatus, MatchStatus, EquiposRondaData, RondaPrediction, ParticipantRondaStats } from '../types';
 
 export interface ParseResult {
   participants: Omit<Participant, 'rank' | 'diffToLeader'>[];
@@ -7,6 +7,7 @@ export interface ParseResult {
   matches: MatchResult[];
   payments: Payment[];
   errors: string[];
+  equiposRonda?: EquiposRondaData;
 }
 
 // Función auxiliar para normalizar texto (sin tildes, minúsculas, sin espacios extra)
@@ -42,10 +43,158 @@ function excelDateToJSDate(serial: any, defaultDate: string): string {
   return defaultDate;
 }
 
-export async function parseExcelFile(file: File): Promise<ParseResult> {
+export function parseEquiposRonda(workbook: any): EquiposRondaData | undefined {
+  const sheetNames = workbook.SheetNames;
+  const sheetName = findSheetName(sheetNames, ['equipos por ronda', 'rondas', 'clasificados ronda']);
+  if (!sheetName) return undefined;
+
+  const sheet = workbook.Sheets[sheetName];
+  const rows: any[][] = utils.sheet_to_json(sheet, { header: 1 });
+  if (rows.length < 5) return undefined;
+
+  // 1. Identificar participantes en Fila 2 (índice 1) empezando en Columna 5 (F)
+  const participantsList: { name: string; colIndex: number }[] = [];
+  const nameRow = rows[1] || [];
+  for (let c = 5; c < nameRow.length; c += 3) {
+    const name = nameRow[c];
+    if (name && typeof name === 'string' && name.trim() !== '' && !name.includes('#REF!')) {
+      participantsList.push({ name: name.trim(), colIndex: c });
+    }
+  }
+
+  // 2. Extraer equipos reales de la Columna C (índice 2)
+  const getCorrectTeams = (startRow: number, endRow: number): string[] => {
+    const teams: string[] = [];
+    for (let r = startRow; r <= endRow; r++) {
+      const row = rows[r];
+      if (row) {
+        const team = row[2];
+        if (team && typeof team === 'string' && team.trim() !== '') {
+          teams.push(team.trim());
+        }
+      }
+    }
+    return teams;
+  };
+
+  const correctDieciseisavos = getCorrectTeams(5, 36);
+  const correctOctavos = getCorrectTeams(40, 55);
+  const correctCuartos = getCorrectTeams(59, 66);
+  const correctSemis = getCorrectTeams(70, 73);
+  const correctFinal = getCorrectTeams(77, 78);
+
+  const isConfirmedDieciseisavos = correctDieciseisavos.length === 32;
+  const isConfirmedOctavos = correctOctavos.length === 16;
+  const isConfirmedCuartos = correctCuartos.length === 8;
+  const isConfirmedSemis = correctSemis.length === 4;
+  const isConfirmedFinal = correctFinal.length === 2;
+
+  // 3. Helper para extraer predicciones de un participante
+  const getParticipantPredictions = (
+    colIndex: number,
+    startRow: number,
+    endRow: number,
+    correctList: string[],
+    isRoundConfirmed: boolean,
+    pointsValue: number
+  ): { predictions: RondaPrediction[]; aciertos: number; points: number } => {
+    const predictions: RondaPrediction[] = [];
+    let aciertos = 0;
+    const normCorrect = new Set(correctList.map(t => normalizeString(t)));
+
+    for (let r = startRow; r <= endRow; r++) {
+      const row = rows[r];
+      if (row) {
+        const teamVal = row[colIndex];
+        if (teamVal && typeof teamVal === 'string' && teamVal.trim() !== '') {
+          const teamName = teamVal.trim();
+          const normTeam = normalizeString(teamName);
+          const isCorrect = normCorrect.has(normTeam);
+          const isPending = !isCorrect && !isRoundConfirmed;
+          
+          if (isCorrect) {
+            aciertos++;
+          }
+
+          predictions.push({
+            teamName,
+            pointsValue,
+            isCorrect,
+            isPending
+          });
+        }
+      }
+    }
+
+    return {
+      predictions,
+      aciertos,
+      points: aciertos * pointsValue
+    };
+  };
+
+  // 4. Calcular estadísticas para cada participante
+  const participantsStats: ParticipantRondaStats[] = participantsList.map(p => {
+    const dieciseisavos = getParticipantPredictions(p.colIndex, 5, 36, correctDieciseisavos, isConfirmedDieciseisavos, 5);
+    const octavos = getParticipantPredictions(p.colIndex, 40, 55, correctOctavos, isConfirmedOctavos, 10);
+    const cuartos = getParticipantPredictions(p.colIndex, 59, 66, correctCuartos, isConfirmedCuartos, 15);
+    const semis = getParticipantPredictions(p.colIndex, 70, 73, correctSemis, isConfirmedSemis, 20);
+    const final = getParticipantPredictions(p.colIndex, 77, 78, correctFinal, isConfirmedFinal, 30);
+
+    const totalAciertos = dieciseisavos.aciertos + octavos.aciertos + cuartos.aciertos + semis.aciertos + final.aciertos;
+    const totalPoints = dieciseisavos.points + octavos.points + cuartos.points + semis.points + final.points;
+
+    return {
+      participantId: normalizeString(p.name),
+      participantName: p.name,
+      aciertos: {
+        dieciseisavos: dieciseisavos.aciertos,
+        octavos: octavos.aciertos,
+        cuartos: cuartos.aciertos,
+        semis: semis.aciertos,
+        final: final.aciertos,
+        total: totalAciertos
+      },
+      points: {
+        dieciseisavos: dieciseisavos.points,
+        octavos: octavos.points,
+        cuartos: cuartos.points,
+        semis: semis.points,
+        final: final.points,
+        total: totalPoints
+      },
+      predictions: {
+        dieciseisavos: dieciseisavos.predictions,
+        octavos: octavos.predictions,
+        cuartos: cuartos.predictions,
+        semis: semis.predictions,
+        final: final.predictions
+      }
+    };
+  });
+
+  return {
+    participantsStats,
+    correctTeams: {
+      dieciseisavos: correctDieciseisavos,
+      octavos: correctOctavos,
+      cuartos: correctCuartos,
+      semis: correctSemis,
+      final: correctFinal
+    },
+    isConfirmed: {
+      dieciseisavos: isConfirmedDieciseisavos,
+      octavos: isConfirmedOctavos,
+      cuartos: isConfirmedCuartos,
+      semis: isConfirmedSemis,
+      final: isConfirmedFinal
+    }
+  };
+}
+
+export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
   const errors: string[] = [];
-  const buffer = await file.arrayBuffer();
-  const workbook = read(buffer, { type: 'array', cellDates: true });
+  const workbook = read(new Uint8Array(buffer), { type: 'array', cellDates: true });
 
   const sheetNames = workbook.SheetNames;
 
@@ -524,12 +673,19 @@ export async function parseExcelFile(file: File): Promise<ParseResult> {
   }
 
   const participants = Object.values(rawParticipantsMap);
+  const equiposRonda = parseEquiposRonda(workbook);
 
   return {
     participants,
     predictions: rawPredictions,
     matches: rawMatches,
     payments: rawPayments,
-    errors
+    errors,
+    equiposRonda
   };
+}
+
+export async function parseExcelFile(file: File): Promise<ParseResult> {
+  const buffer = await file.arrayBuffer();
+  return parseExcelBuffer(buffer);
 }

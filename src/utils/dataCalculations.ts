@@ -1,4 +1,4 @@
-import { Participant, Prediction, MatchResult, Payment, SummaryStats, Insight, PollaData, CurrencySummary } from '../types';
+import { Participant, Prediction, MatchResult, Payment, SummaryStats, Insight, PollaData, CurrencySummary, EquiposRondaData } from '../types';
 
 export function calculatePollaData(
   rawParticipants: Omit<Participant, 'rank' | 'diffToLeader'>[],
@@ -6,10 +6,31 @@ export function calculatePollaData(
   predictions: Prediction[],
   payments: Payment[],
   isDemo: boolean = false,
-  sourceFileName?: string
+  sourceFileName?: string,
+  equiposRonda?: EquiposRondaData
 ): PollaData {
+  // Normalizar nombres y sumar puntos de Equipos por Ronda si existen
+  let updatedParticipants = [...rawParticipants];
+  if (equiposRonda && equiposRonda.participantsStats) {
+    const statsMap = new Map(
+      equiposRonda.participantsStats.map(s => [s.participantId, s])
+    );
+    updatedParticipants = updatedParticipants.map(p => {
+      const normName = p.name.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+      const stats = statsMap.get(normName);
+      if (stats) {
+        return {
+          ...p,
+          knockoutsPoints: p.knockoutsPoints + stats.points.total,
+          totalPoints: p.totalPoints + stats.points.total
+        };
+      }
+      return p;
+    });
+  }
+
   // 1. Ordenar participantes por puntaje total descendente
-  const sorted = [...rawParticipants].sort((a, b) => b.totalPoints - a.totalPoints);
+  const sorted = [...updatedParticipants].sort((a, b) => b.totalPoints - a.totalPoints);
   
   const maxPoints = sorted.length > 0 ? sorted[0].totalPoints : 0;
   
@@ -149,6 +170,7 @@ export function calculatePollaData(
     insights,
     lastUpdated: new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
     isDemo,
-    sourceFileName
+    sourceFileName,
+    equiposRonda
   };
 }

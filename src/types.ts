@@ -93,6 +93,59 @@ export interface ChartDataPoint {
   knockouts: number;
 }
 
+export interface RondaPrediction {
+  teamName: string;
+  pointsValue: number;
+  isCorrect: boolean;
+  isPending: boolean;
+}
+
+export interface ParticipantRondaStats {
+  participantId: string;
+  participantName: string;
+  aciertos: {
+    dieciseisavos: number;
+    octavos: number;
+    cuartos: number;
+    semis: number;
+    final: number;
+    total: number;
+  };
+  points: {
+    dieciseisavos: number;
+    octavos: number;
+    cuartos: number;
+    semis: number;
+    final: number;
+    total: number;
+  };
+  predictions: {
+    dieciseisavos: RondaPrediction[];
+    octavos: RondaPrediction[];
+    cuartos: RondaPrediction[];
+    semis: RondaPrediction[];
+    final: RondaPrediction[];
+  };
+}
+
+export interface EquiposRondaData {
+  participantsStats: ParticipantRondaStats[];
+  correctTeams: {
+    dieciseisavos: string[];
+    octavos: string[];
+    cuartos: string[];
+    semis: string[];
+    final: string[];
+  };
+  isConfirmed: {
+    dieciseisavos: boolean;
+    octavos: boolean;
+    cuartos: boolean;
+    semis: boolean;
+    final: boolean;
+  };
+}
+
 export interface PollaData {
   participants: Participant[];
   predictions: Prediction[];
@@ -103,4 +156,5 @@ export interface PollaData {
   lastUpdated: string;
   isDemo: boolean;
   sourceFileName?: string;
+  equiposRonda?: EquiposRondaData;
 }
