@@ -26,6 +26,38 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
 
   const { participantsStats, correctTeams, isConfirmed } = equiposRondaData;
 
+  const MULTIPLIERS = {
+    dieciseisavos: 3,
+    octavos: 5,
+    cuartos: 10,
+    semis: 15,
+    final: 20
+  };
+
+  // Recalcular puntos locales para esta sección según las reglas específicas de la sección
+  const localParticipantsStats = useMemo(() => {
+    return participantsStats.map(p => {
+      const dieciseisavosPoints = p.aciertos.dieciseisavos * MULTIPLIERS.dieciseisavos;
+      const octavosPoints = p.aciertos.octavos * MULTIPLIERS.octavos;
+      const cuartosPoints = p.aciertos.cuartos * MULTIPLIERS.cuartos;
+      const semisPoints = p.aciertos.semis * MULTIPLIERS.semis;
+      const finalPoints = p.aciertos.final * MULTIPLIERS.final;
+      const totalPoints = dieciseisavosPoints + octavosPoints + cuartosPoints + semisPoints + finalPoints;
+      
+      return {
+        ...p,
+        points: {
+          dieciseisavos: dieciseisavosPoints,
+          octavos: octavosPoints,
+          cuartos: cuartosPoints,
+          semis: semisPoints,
+          final: finalPoints,
+          total: totalPoints
+        }
+      };
+    });
+  }, [participantsStats]);
+
   // Calcular total de clasificados confirmados en el torneo actualmente
   const totalConfirmedSpots = useMemo(() => {
     return (
@@ -39,13 +71,13 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
 
   // Ordenar participantes por aciertos totales descendente, y luego por puntos totales descendente
   const sortedStats = useMemo(() => {
-    return [...participantsStats].sort((a, b) => {
+    return [...localParticipantsStats].sort((a, b) => {
       if (b.aciertos.total !== a.aciertos.total) {
         return b.aciertos.total - a.aciertos.total;
       }
       return b.points.total - a.points.total;
     });
-  }, [participantsStats]);
+  }, [localParticipantsStats]);
 
   // Asignar rangos manejando empates
   const statsWithRanks = useMemo(() => {
@@ -68,8 +100,8 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
   // Si no hay participante seleccionado por defecto, seleccionar al primero
   const selectedParticipant = useMemo(() => {
     const id = selectedParticipantId || (filteredParticipants[0]?.participantId);
-    return participantsStats.find(p => p.participantId === id) || null;
-  }, [participantsStats, selectedParticipantId, filteredParticipants]);
+    return localParticipantsStats.find(p => p.participantId === id) || null;
+  }, [localParticipantsStats, selectedParticipantId, filteredParticipants]);
 
   // Clases CSS para medallas o badges según el rango
   const getRankBadgeStyles = (rank: number) => {
@@ -117,7 +149,7 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
           </h2>
           <p className="text-xs text-slate-400 leading-relaxed mt-1">
             Ranking especializado de equipos clasificados. Acertar equipos suma puntos directos: 
-            Dieciseisavos (5 pts), Octavos (10 pts), Cuartos (15 pts), Semis (20 pts), Final (30 pts).
+            Dieciseisavos (3 pts), Octavos (5 pts), Cuartos (10 pts), Semis (15 pts), Final (20 pts).
           </p>
         </div>
 
@@ -266,7 +298,7 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
                   {/* Dieciseisavos (Round of 32) */}
                   <RoundPredictionSection 
                     title="Dieciseisavos (Round of 32)" 
-                    pointsText="5 pts c/u"
+                    pointsText="3 pts c/u"
                     predictions={selectedParticipant.predictions.dieciseisavos} 
                     correctList={correctTeams.dieciseisavos}
                     isConfirmed={isConfirmed.dieciseisavos}
@@ -276,7 +308,7 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
                   {/* Octavos (Round of 16) */}
                   <RoundPredictionSection 
                     title="Octavos de Final" 
-                    pointsText="10 pts c/u"
+                    pointsText="5 pts c/u"
                     predictions={selectedParticipant.predictions.octavos} 
                     correctList={correctTeams.octavos}
                     isConfirmed={isConfirmed.octavos}
@@ -286,7 +318,7 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
                   {/* Cuartos de Final */}
                   <RoundPredictionSection 
                     title="Cuartos de Final" 
-                    pointsText="15 pts c/u"
+                    pointsText="10 pts c/u"
                     predictions={selectedParticipant.predictions.cuartos} 
                     correctList={correctTeams.cuartos}
                     isConfirmed={isConfirmed.cuartos}
@@ -296,7 +328,7 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
                   {/* Semifinales */}
                   <RoundPredictionSection 
                     title="Semifinales" 
-                    pointsText="20 pts c/u"
+                    pointsText="15 pts c/u"
                     predictions={selectedParticipant.predictions.semis} 
                     correctList={correctTeams.semis}
                     isConfirmed={isConfirmed.semis}
@@ -306,7 +338,7 @@ export const AciertosRondaPanel: React.FC<AciertosRondaPanelProps> = ({ equiposR
                   {/* Final (Finalistas) */}
                   <RoundPredictionSection 
                     title="Gran Final" 
-                    pointsText="30 pts c/u"
+                    pointsText="20 pts c/u"
                     predictions={selectedParticipant.predictions.final} 
                     correctList={correctTeams.final}
                     isConfirmed={isConfirmed.final}
