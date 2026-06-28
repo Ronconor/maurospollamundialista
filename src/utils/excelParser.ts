@@ -444,6 +444,17 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
           const matchId = `k-${m}-${normalizeString(stage)}`;
           const dateStr = excelDateToJSDate(dateRowK ? dateRowK[homeCol] : null, '2026-06-28');
           
+          const rawHomeVal = rowsK[3] ? rowsK[3][homeCol] : undefined;
+          const rawAwayVal = rowsK[3] ? rowsK[3][awayCol] : undefined;
+
+          const homeTeam = (rawHomeVal && rawHomeVal.toString().trim() !== '')
+            ? rawHomeVal.toString().trim()
+            : `Clasificado ${m*2+1}`;
+
+          const awayTeam = (rawAwayVal && rawAwayVal.toString().trim() !== '')
+            ? rawAwayVal.toString().trim()
+            : `Clasificado ${m*2+2}`;
+
           let actHomeScore: number | undefined = undefined;
           let actAwayScore: number | undefined = undefined;
           let matchStatus: MatchStatus = 'pendiente';
@@ -455,15 +466,12 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
             actAwayScore = parseInt(realRowK[awayCol]);
             if (!isNaN(actHomeScore) && !isNaN(actAwayScore)) {
               matchStatus = 'finalizado';
-              winner = actHomeScore > actAwayScore ? `Ganador ${m*2+1}` : actHomeScore < actAwayScore ? `Ganador ${m*2+2}` : 'Empate';
+              winner = actHomeScore > actAwayScore ? homeTeam : actHomeScore < actAwayScore ? awayTeam : 'Empate';
             } else {
               actHomeScore = undefined;
               actAwayScore = undefined;
             }
           }
-
-          const homeTeam = `Clasificado ${m*2+1}`;
-          const awayTeam = `Clasificado ${m*2+2}`;
 
           rawMatches.push({
             id: matchId,
