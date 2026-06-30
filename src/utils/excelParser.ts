@@ -529,9 +529,8 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
                     const predDiff = predHome - predAway;
                     const actDiff = actHomeScore - actAwayScore;
 
-                    const isFinalStages = stage.toLowerCase().includes('semis') || stage.toLowerCase().includes('final') || stage.toLowerCase().includes('3 y 4');
-                    const perfPoints = isFinalStages ? 15 : 10; // Marcador perfecto: 15 en semis/final, 10 en el resto
-                    const winPoints = isFinalStages ? 6 : 4;   // Ganador correcto: 6 en semis/final, 4 en el resto
+                    const perfPoints = 10;
+                    const winPoints = 4;
 
                     if (predHome === actHomeScore && predAway === actAwayScore) {
                       predStatus = 'acierto';

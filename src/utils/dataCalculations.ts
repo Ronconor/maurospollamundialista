@@ -21,8 +21,7 @@ export function calculatePollaData(
       if (stats) {
         return {
           ...p,
-          rondaPoints: stats.points.total,
-          totalPoints: p.totalPoints + stats.points.total
+          rondaPoints: stats.points.total
         };
       }
       return p;
