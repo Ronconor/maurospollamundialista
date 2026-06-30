@@ -10,6 +10,7 @@ export interface Participant {
   totalPoints: number;
   groupsPoints: number;
   knockoutsPoints: number;
+  rondaPoints?: number;
   paymentStatus: PaymentStatus;
   amountPaid: number;
   currency: string;

@@ -290,6 +290,7 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
                   totalPoints: 0,
                   groupsPoints: 0,
                   knockoutsPoints: 0,
+                  rondaPoints: 0,
                   paymentStatus: 'sin_informacion',
                   amountPaid: 0,
                   currency: 'COP'
@@ -408,6 +409,7 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
               totalPoints: 0,
               groupsPoints: 0,
               knockoutsPoints: 0,
+              rondaPoints: 0,
               paymentStatus: 'sin_informacion',
               amountPaid: 0,
               currency: 'COP'
@@ -503,6 +505,7 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
                   totalPoints: 0,
                   groupsPoints: 0,
                   knockoutsPoints: 0,
+                  rondaPoints: 0,
                   paymentStatus: 'sin_informacion',
                   amountPaid: 0,
                   currency: 'COP'
@@ -613,6 +616,7 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
               totalPoints: 0,
               groupsPoints: 0,
               knockoutsPoints: 0,
+              rondaPoints: 0,
               paymentStatus: 'sin_informacion',
               amountPaid: 0,
               currency: 'COP'
@@ -671,6 +675,7 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
             totalPoints: 0,
             groupsPoints: 0,
             knockoutsPoints: 0,
+            rondaPoints: 0,
             paymentStatus: status,
             amountPaid: amount,
             currency

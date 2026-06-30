@@ -21,6 +21,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({ participants, summ
       Puntos: p.totalPoints,
       Grupos: p.groupsPoints,
       Knockouts: p.knockoutsPoints,
+      Rondas: p.rondaPoints || 0,
     }));
   }, [participants]);
 

@@ -12,7 +12,7 @@ export const RankingTable: React.FC<RankingTableProps> = ({ participants, onSele
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('todos');
   const [limit, setLimit] = useState<number>(0); // 0 = todos
-  const [sortBy, setSortBy] = useState<'rank' | 'name' | 'totalPoints' | 'groupsPoints' | 'knockoutsPoints'>('rank');
+  const [sortBy, setSortBy] = useState<'rank' | 'name' | 'totalPoints' | 'groupsPoints' | 'knockoutsPoints' | 'rondaPoints'>('rank');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const filteredParticipants = useMemo(() => {
@@ -31,8 +31,8 @@ export const RankingTable: React.FC<RankingTableProps> = ({ participants, onSele
 
     // Ordenamiento
     result.sort((a, b) => {
-      let valA = a[sortBy];
-      let valB = b[sortBy];
+      let valA = a[sortBy] ?? 0;
+      let valB = b[sortBy] ?? 0;
 
       if (typeof valA === 'string') {
         valA = (valA as string).toLowerCase();
@@ -52,7 +52,7 @@ export const RankingTable: React.FC<RankingTableProps> = ({ participants, onSele
     return result;
   }, [participants, searchTerm, filterStatus, limit, sortBy, sortOrder]);
 
-  const handleSort = (field: 'rank' | 'name' | 'totalPoints' | 'groupsPoints' | 'knockoutsPoints') => {
+  const handleSort = (field: 'rank' | 'name' | 'totalPoints' | 'groupsPoints' | 'knockoutsPoints' | 'rondaPoints') => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -172,6 +172,12 @@ export const RankingTable: React.FC<RankingTableProps> = ({ participants, onSele
                   <ArrowUpDown className="w-3 h-3" />
                 </div>
               </th>
+              <th className="py-4 px-4 text-center hidden sm:table-cell cursor-pointer hover:text-pitch-green transition-colors" onClick={() => handleSort('rondaPoints')}>
+                <div className="flex items-center justify-center gap-1">
+                  <span>Rondas</span>
+                  <ArrowUpDown className="w-3 h-3" />
+                </div>
+              </th>
               <th className="py-4 px-4 text-center">Estado Pago</th>
               <th className="py-4 px-6 text-center hidden md:table-cell">Dif con Líder</th>
             </tr>
@@ -240,6 +246,10 @@ export const RankingTable: React.FC<RankingTableProps> = ({ participants, onSele
                     {/* Puntos Knockouts */}
                     <td className="py-4 px-4 text-center hidden sm:table-cell text-xs font-semibold text-slate-300">
                       {p.knockoutsPoints}
+                    </td>
+                    {/* Puntos Rondas */}
+                    <td className="py-4 px-4 text-center hidden sm:table-cell text-xs font-semibold text-slate-300">
+                      {p.rondaPoints || 0}
                     </td>
 
                     {/* Estado de Pago */}

@@ -29,9 +29,9 @@ export const Header: React.FC<HeaderProps> = ({
     if (participants.length === 0) return;
 
     // Crear contenido CSV
-    const headers = ['Posicion,Participante,Puntos Totales,Puntos Grupos,Puntos Knockouts,Estado Pago,Monto Pagado,Moneda,Diferencia Lider'];
+    const headers = ['Posicion,Participante,Puntos Totales,Puntos Grupos,Puntos Knockouts,Puntos Rondas,Estado Pago,Monto Pagado,Moneda,Diferencia Lider'];
     const rows = participants.map(p => 
-      `${p.rank},"${p.name}",${p.totalPoints},${p.groupsPoints},${p.knockoutsPoints},${p.paymentStatus},${p.amountPaid},${p.currency},${p.diffToLeader}`
+      `${p.rank},"${p.name}",${p.totalPoints},${p.groupsPoints},${p.knockoutsPoints},${p.rondaPoints || 0},${p.paymentStatus},${p.amountPaid},${p.currency},${p.diffToLeader}`
     );
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n');
