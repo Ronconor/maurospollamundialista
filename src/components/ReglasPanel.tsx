@@ -174,23 +174,23 @@ export const ReglasPanel: React.FC = () => {
                 <div className="grid grid-cols-5 gap-1.5 text-center mt-1">
                   <div className="bg-slate-950/80 p-2 rounded-lg border border-slate-850">
                     <p className="text-[9px] text-slate-400 font-bold">16avos</p>
-                    <p className="font-extrabold text-pitch-green-light mt-0.5">5 pts</p>
+                    <p className="font-extrabold text-pitch-green-light mt-0.5">3 pts</p>
                   </div>
                   <div className="bg-slate-950/80 p-2 rounded-lg border border-slate-850">
                     <p className="text-[9px] text-slate-400 font-bold">Octavos</p>
-                    <p className="font-extrabold text-pitch-green-light mt-0.5">10 pts</p>
+                    <p className="font-extrabold text-pitch-green-light mt-0.5">5 pts</p>
                   </div>
                   <div className="bg-slate-950/80 p-2 rounded-lg border border-slate-850">
                     <p className="text-[9px] text-slate-400 font-bold">Cuartos</p>
-                    <p className="font-extrabold text-pitch-green-light mt-0.5">15 pts</p>
+                    <p className="font-extrabold text-pitch-green-light mt-0.5">10 pts</p>
                   </div>
                   <div className="bg-slate-950/80 p-2 rounded-lg border border-slate-850">
                     <p className="text-[9px] text-slate-400 font-bold">Semis</p>
-                    <p className="font-extrabold text-pitch-green-light mt-0.5">20 pts</p>
+                    <p className="font-extrabold text-pitch-green-light mt-0.5">15 pts</p>
                   </div>
                   <div className="bg-slate-950/80 p-2 rounded-lg border border-slate-850">
                     <p className="text-[9px] text-slate-400 font-bold">Final</p>
-                    <p className="font-extrabold text-pitch-green-light mt-0.5">30 pts</p>
+                    <p className="font-extrabold text-pitch-green-light mt-0.5">20 pts</p>
                   </div>
                 </div>
               </div>

@@ -135,11 +135,11 @@ export function parseEquiposRonda(workbook: any): EquiposRondaData | undefined {
 
   // 4. Calcular estadísticas para cada participante
   const participantsStats: ParticipantRondaStats[] = participantsList.map(p => {
-    const dieciseisavos = getParticipantPredictions(p.colIndex, 5, 36, correctDieciseisavos, isConfirmedDieciseisavos, 5);
-    const octavos = getParticipantPredictions(p.colIndex, 40, 55, correctOctavos, isConfirmedOctavos, 10);
-    const cuartos = getParticipantPredictions(p.colIndex, 59, 66, correctCuartos, isConfirmedCuartos, 15);
-    const semis = getParticipantPredictions(p.colIndex, 70, 73, correctSemis, isConfirmedSemis, 20);
-    const final = getParticipantPredictions(p.colIndex, 77, 78, correctFinal, isConfirmedFinal, 30);
+    const dieciseisavos = getParticipantPredictions(p.colIndex, 5, 36, correctDieciseisavos, isConfirmedDieciseisavos, 3);
+    const octavos = getParticipantPredictions(p.colIndex, 40, 55, correctOctavos, isConfirmedOctavos, 5);
+    const cuartos = getParticipantPredictions(p.colIndex, 59, 66, correctCuartos, isConfirmedCuartos, 10);
+    const semis = getParticipantPredictions(p.colIndex, 70, 73, correctSemis, isConfirmedSemis, 15);
+    const final = getParticipantPredictions(p.colIndex, 77, 78, correctFinal, isConfirmedFinal, 20);
 
     const totalAciertos = dieciseisavos.aciertos + octavos.aciertos + cuartos.aciertos + semis.aciertos + final.aciertos;
     const totalPoints = dieciseisavos.points + octavos.points + cuartos.points + semis.points + final.points;
